@@ -3,8 +3,8 @@ import requests
 import json
 
 # 查询接口
-def getGegu(gu_code):
-    gegu = requests.get('http://hq.sinajs.cn/list=' + gu_code)
+def getGegu(gg_code):
+    gegu = requests.get('http://hq.sinajs.cn/list=' + gg_code)
     gegu_status = gegu.status_code
     if gegu_status != 200:
         return False
@@ -73,14 +73,25 @@ def getGegu(gu_code):
     gegu_date = allinfo[30]
     # 时间
     gegu_time = allinfo[31]
-    res_info = {'gegu_name': gegu_name, 'gegu_jinkai': gegu_jinkai, 'gegu_zuoshou': gegu_zuoshou, 'gegu_xianjia': gegu_xianjia,\
-            'gegu_jingao': gegu_jingao, 'gegu_jingmai':gegu_jingmai,'gegu_jingnai':gegu_jingnai,'gegu_chengjiaoshu':gegu_chengjiaoshu,\
-            'gegu_chengjiaoe':gegu_chengjiaoe,'gegu_mai1':gegu_mai1,'gegu_mai1p':gegu_mai1p,'gegu_mai2':gegu_mai2,\
-            'gegu_mai2p':gegu_mai2p,'gegu_mai3':gegu_mai3,'gegu_mai3p':gegu_mai3p,'gegu_mai4':gegu_mai4,'gegu_mai4p':gegu_mai4p,\
-            'gegu_mai5':gegu_mai5,'gegu_mai5p':gegu_mai5p,'gegu_nai1':gegu_nai1,'gegu_nai1p':gegu_nai1p,'gegu_nai2':gegu_nai2,\
-            'gegu_nai2p':gegu_nai2p,'gegu_nai3':gegu_nai3,'gegu_nai3p':gegu_nai3p,'gegu_nai4':gegu_nai4,'gegu_nai4p':gegu_nai4p,\
-            'gegu_nai5':gegu_nai5,'gegu_nai5p':gegu_nai5p,'gegu_date':gegu_date,'gegu_time':gegu_time}
-    return res_info
+    # 涨幅
+    zuoshou =   float(gegu_zuoshou)
+    jg = float(gegu_xianjia)
+    cha = jg    -   zuoshou
+    if cha > 0:
+        diff = cha / zuoshou
+    else:
+        diff = -(-cha / zuoshou)
+    gegu_diff = str(round(diff * 100, 2)) + '%'
+    ggu = {"var hq_str_sh" +  gg_code + "=" + gegu_name,gegu_jinkai,gegu_zuoshou,gegu_xianjia,gegu_jindi,gegu_jingao,gegu_diff}
+    res_info = {'gegu_name': gegu_name,'gegu_jinkai': gegu_jinkai,'gegu_zuoshou': gegu_zuoshou,'gegu_xianjia': gegu_xianjia,\
+            #  'gegu_jingmai':gegu_jingmai,'gegu_jingnai':gegu_jingnai,'gegu_chengjiaoshu':gegu_chengjiaoshu,\
+            # 'gegu_chengjiaoe':gegu_chengjiaoe,'gegu_mai1':gegu_mai1,'gegu_mai1p':gegu_mai1p,'gegu_mai2':gegu_mai2,\
+            # 'gegu_mai2p':gegu_mai2p,'gegu_mai3':gegu_mai3,'gegu_mai3p':gegu_mai3p,'gegu_mai4':gegu_mai4,'gegu_mai4p':gegu_mai4p,\
+            # 'gegu_mai5':gegu_mai5,'gegu_mai5p':gegu_mai5p,'gegu_nai1':gegu_nai1,'gegu_nai1p':gegu_nai1p,'gegu_nai2':gegu_nai2,\
+            # 'gegu_nai2p':gegu_nai2p,'gegu_nai3':gegu_nai3,'gegu_nai3p':gegu_nai3p,'gegu_nai4':gegu_nai4,'gegu_nai4p':gegu_nai4p,\
+            # 'gegu_nai5':gegu_nai5,'gegu_nai5p':gegu_nai5p,'gegu_date':gegu_date,'gegu_time':gegu_time,
+                'gegu_jindi': gegu_jindi, 'gegu_jingao': gegu_jingao, 'gegu_diff': gegu_diff}
+    return res_info,ggu
 
 # res {'fundcode': '003095', 'name': '中欧医疗健康混合A', 'jzrq': '2020-12-17', 'dwjz': '3.2840', 'gsz': '3.2822', 'gszzl': '-0.06', 'gztime': '2020-12-18 15:00'}
 def getJijin(ji_code):
@@ -91,4 +102,3 @@ def getJijin(ji_code):
         return False
     jijin_info = json.loads(jijin_gu.text[8:-2])
     return jijin_info, jijin_jin.text
-
